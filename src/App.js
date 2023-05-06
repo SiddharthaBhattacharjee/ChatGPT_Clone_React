@@ -4,27 +4,37 @@ import React, { useState, useEffect } from 'react';
 import gptIcon from './images/gpt.jpg';
 import Message from './Message.js';
 import { Configuration, OpenAIApi } from "openai"
-
-
+import axios from 'axios';
 
 
 function App() {
 
   const openai = new OpenAIApi(new Configuration({ apikey: process.env.REACT_APP_API_KEY }));
 
-  const [messages, setMessages] = useState([]);
+  const [Allmessages, setAllMessages] = useState([]);
   const [text, setText] = useState('');
 
-  const onSend = async () => {
-    setMessages([...messages, { role: 'user', content: text }]);
-    setText('');
-    openai.createChatCompletion({
+  //code here::::
+
+  function getChatCompletion(usermsg) {
+
+    let data = {
       model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content:  text }]
-    }).then(
+      messages: [{ role: "user", content: text }]
+    }
+
+    let config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.REACT_APP_API_KEY}`,
+        'User-Agent': 'My User Agent'
+      }
+    }
+
+    axios.post('https://api.openai.com/v1/chat/completions', data, config).then(
       res => {
         console.log(res.data.choices[0].message.content);
-        setMessages([...messages, { role: 'assistant', content: res.data.choices[0].message.content }]);
+        setAllMessages(Allmessages.concat([usermsg,{ role: 'assistant', content: res.data.choices[0].message.content }]));
       }
     ).catch(
       err => {
@@ -33,23 +43,31 @@ function App() {
     )
   }
 
+  const printMessages = () => {
+    console.log(Allmessages);
+  }
+
+  useEffect(() => {
+    printMessages();
+  }, [Allmessages]);
+
+  // till here::::
+
+  const onSend = async () => {
+    setAllMessages([...Allmessages, { role: 'user', content: text }]);
+    setText('');
+    setTimeout(() => {
+      getChatCompletion({ role: 'user', content: text });
+    }, 1000);
+  }
+
   const handleKeyPress = async (event) => {
     if (event.key === 'Enter') {
-      setMessages([...messages, { role: "user", content: text }]);
+      setAllMessages([...Allmessages, { role: 'user', content: text }]);
       setText('');
-      openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: 'user', content: text}]
-      }).then(
-        res => {
-          console.log(res.data.choices[0].message.content);
-          setMessages([...messages, { role: 'assistant', content: res.data.choices[0].message.content }]);
-        }
-      ).catch(
-        err => {
-          console.log(err);
-        }
-      )
+      setTimeout(() => {
+        getChatCompletion({ role: 'user', content: text });
+      }, 1000);
     }
   };
 
@@ -65,7 +83,7 @@ function App() {
         <h1>ChatGPT Clone</h1>
       </div>
       <div className="messages">
-        {messages.map((message, index) => (
+        {Allmessages.map((message, index) => (
           <Message key={index} sender={message.role} text={message.content} />
         ))}
       </div>
