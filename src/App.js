@@ -20,7 +20,7 @@ function App() {
 
     let data = {
       model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: text }]
+      messages: [...Allmessages,{ role: "user", content: text }]
     }
 
     let config = {
@@ -34,7 +34,13 @@ function App() {
     axios.post('https://api.openai.com/v1/chat/completions', data, config).then(
       res => {
         console.log(res.data.choices[0].message.content);
-        setAllMessages(Allmessages.concat([usermsg,{ role: 'assistant', content: res.data.choices[0].message.content }]));
+        let op = res.data.choices[0].message.content;
+        const hasCodeBlock = op.includes("```");
+        if (hasCodeBlock) {
+          op = op.replace(/```([\s\S]+?)```/g, '<pre><code>$1</code></pre>');
+        }
+        op = op ;
+        setAllMessages(Allmessages.concat([usermsg,{ role: 'assistant', content: op }]));
       }
     ).catch(
       err => {

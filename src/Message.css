@@ -28,4 +28,5 @@
 .messageSpace{
     width: 90%;
     display: block;
+    text-align: left;
 }
