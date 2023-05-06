@@ -1,0 +1,31 @@
+.message {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+.user {
+    background-color: #272a2bc1;
+    color: #fff;
+    font-size: 20px;
+}
+
+.bot {
+    background-color: #484848c3;
+    color: white;
+    font-size: 20px;
+}
+
+.iconSpace{
+    width: 10%;
+    display: block;
+}
+
+.messageSpace{
+    width: 90%;
+    display: block;
+}
