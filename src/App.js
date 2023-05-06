@@ -14,8 +14,6 @@ function App() {
   const [Allmessages, setAllMessages] = useState([]);
   const [text, setText] = useState('');
 
-  //code here::::
-
   function getChatCompletion(usermsg) {
 
     let data = {
@@ -56,8 +54,6 @@ function App() {
   useEffect(() => {
     printMessages();
   }, [Allmessages]);
-
-  // till here::::
 
   const onSend = async () => {
     setAllMessages([...Allmessages, { role: 'user', content: text }]);
